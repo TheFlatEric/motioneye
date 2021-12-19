@@ -1025,6 +1025,8 @@ class SFTP(UploadService):
 
         self.debug('creating sftp connection to {}@{}:{}'.format(
                 self._username, self._server, self._port))
+        
+        self.debug('using keyfile {}').format(self._keyfile)
 
         self._conn = pycurl.Curl()
         self._conn.setopt(self._conn.URL, sftp_url)
