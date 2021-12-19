@@ -1035,7 +1035,7 @@ class SFTP(UploadService):
         auth_types = {
             'password': self._conn.SSH_AUTH_PASSWORD,
             # ref: https://curl.haxx.se/libcurl/c/CURLOPT_SSH_PRIVATE_KEYFILE.html
-            'keyfile': self._conn.SSH_PRIVATE_KEYFILE
+            'keyfile': self._conn.SSH_AUTH_PUBLICKEY
         }
 
         try:
@@ -1051,6 +1051,7 @@ class SFTP(UploadService):
         elif auth_type == 'keyfile':
             self._conn.setopt(self._conn.USERNAME, self._username)
             self._conn.setopt(self._conn.SSH_PRIVATE_KEYFILE, self._keyfile)
+            self._conn.setopt(self._conn.SSH_PUBLIC_KEYFILE, (self._keyfile + ".pub"))
 
         self._conn.setopt(self._conn.UPLOAD, 1)
 
