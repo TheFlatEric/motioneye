@@ -1913,6 +1913,7 @@ function cameraUi2Dict() {
         'upload_subfolders': $('#uploadSubfoldersSwitch')[0].checked,
         'upload_username': $('#uploadUsernameEntry').val(),
         'upload_password': $('#uploadPasswordEntry').val(),
+        'upload_keyfile': $('#uploadKeyfileEntry').val(),
         'upload_authorization_key': $('#uploadAuthorizationKeyEntry').val(),
         'clean_cloud_enabled': $('#cleanCloudEnabledSwitch')[0].checked,
         'web_hook_storage_enabled': $('#webHookStorageEnabledSwitch')[0].checked,
@@ -2236,6 +2237,7 @@ function dict2CameraUi(dict) {
     $('#uploadSubfoldersSwitch')[0].checked = dict['upload_subfolders']; markHideIfNull('upload_subfolders', 'uploadSubfoldersSwitch');
     $('#uploadUsernameEntry').val(dict['upload_username']); markHideIfNull('upload_username', 'uploadUsernameEntry');
     $('#uploadPasswordEntry').val(dict['upload_password']); markHideIfNull('upload_password', 'uploadPasswordEntry');
+    $('#uploadKeyfileEntry').val(dict['upload_keyfile']); markHideIfNull('upload_keyfile', 'uploadKeyfileEntry');
     $('#uploadAuthorizationKeyEntry').val(dict['upload_authorization_key']); markHideIfNull('upload_authorization_key', 'uploadAuthorizationKeyEntry');
     $('#cleanCloudEnabledSwitch')[0].checked = dict['clean_cloud_enabled']; markHideIfNull('clean_cloud_enabled', 'cleanCloudEnabledSwitch');
 
@@ -2961,6 +2963,7 @@ function doTestUpload() {
         subfolders: $('#uploadSubfoldersSwitch')[0].checked,
         username: $('#uploadUsernameEntry').val(),
         password: $('#uploadPasswordEntry').val(),
+        keyfile: $('#uploadKeyfileEntry').val(),
         authorization_key: $('#uploadAuthorizationKeyEntry').val()
     };
 
