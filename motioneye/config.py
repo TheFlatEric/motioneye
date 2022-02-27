@@ -393,7 +393,8 @@ def get_camera(camera_id, as_lines=False):
     camera_config = _conf_to_dict(lines,
                                   no_convert=['@network_share_name', '@network_smb_ver', '@network_server',
                                               '@network_username', '@network_password', '@storage_device',
-                                              '@upload_server', '@upload_username', '@upload_password'])
+                                              '@upload_server', '@upload_username', '@upload_password',
+                                              '@upload_keyfile'])
 
     if utils.is_local_motion_camera(camera_config):
         # determine the enabled status
@@ -724,6 +725,7 @@ def motion_camera_ui_to_dict(ui, prev_config=None):
         '@upload_subfolders': ui['upload_subfolders'],
         '@upload_username': ui['upload_username'],
         '@upload_password': ui['upload_password'],
+        '@upload_keyfile': ui['upload_keyfile'],
         '@clean_cloud_enabled': ui['clean_cloud_enabled'],
 
         # text overlay
@@ -1111,6 +1113,7 @@ def motion_camera_dict_to_ui(data):
         'upload_subfolders': data['@upload_subfolders'],
         'upload_username': data['@upload_username'],
         'upload_password': data['@upload_password'],
+        'upload_keyfile': data['@upload_keyfile'],
         'upload_authorization_key': '',  # needed, otherwise the field is hidden
         'clean_cloud_enabled': data['@clean_cloud_enabled'],
         'web_hook_storage_enabled': False,
@@ -1930,6 +1933,7 @@ def _set_default_motion_camera(camera_id, data):
     data.setdefault('@upload_subfolders', True)
     data.setdefault('@upload_username', '')
     data.setdefault('@upload_password', '')
+    data.setdefault('@upload_keyfile', '')
     data.setdefault('@clean_cloud_enabled', False)
 
     data.setdefault('stream_localhost', False)

@@ -942,6 +942,8 @@ class SFTP(UploadService):
         self._username = None
         self._password = None
         self._location = None
+        self._keyfile = None
+        self._authtype = "password"
 
         UploadService.__init__(self, camera_id)
 
@@ -972,7 +974,7 @@ class SFTP(UploadService):
         rm_operations = ['RM {}/{}'.format(self._location, test_file),
                          'RMDIR {}/{}'.format(self._location, test_folder)]
 
-        conn = self._get_conn(test_file)
+        conn = self._get_conn(test_file, self._authtype)
         conn.setopt(conn.POSTQUOTE, rm_operations)  # Executed after transfer.
         conn.setopt(pycurl.READFUNCTION, StringIO.StringIO().read)
 
@@ -986,7 +988,7 @@ class SFTP(UploadService):
             return str(e)
 
     def upload_data(self, filename, mime_type, data, ctime, camera_name):
-        conn = self._get_conn(filename)
+        conn = self._get_conn(filename, self._authtype)
         conn.setopt(pycurl.READFUNCTION, StringIO.StringIO(data).read)
 
         self.curl_perform_filetransfer(conn)
@@ -997,6 +999,7 @@ class SFTP(UploadService):
             'port': self._port,
             'username': self._username,
             'password': self._password,
+            'keyfile': self._keyfile,
             'location': self._location
         }
 
@@ -1009,15 +1012,22 @@ class SFTP(UploadService):
             self._username = data['username']
         if data.get('password') is not None:
             self._password = data['password']
+            self._authtype = "password"
+        if data.get('keyfile') is not None:
+            self._keyfile = data['keyfile']
+            self._authtype ="keyfile"
         if data.get('location'):
             self._location = data['location']
 
-    def _get_conn(self, filename, auth_type='password'):
+    def _get_conn(self, filename, auth_type):
         sftp_url = 'sftp://{}:{}/{}/{}'.format(self._server, self._port,
                                                self._location, filename)
 
         self.debug('creating sftp connection to {}@{}:{}'.format(
                 self._username, self._server, self._port))
+        
+        self.debug('auth type is {}'.format(auth_type))
+        self.debug('using keyfile {}'.format(self._keyfile))
 
         self._conn = pycurl.Curl()
         self._conn.setopt(self._conn.URL, sftp_url)
@@ -1025,8 +1035,8 @@ class SFTP(UploadService):
 
         auth_types = {
             'password': self._conn.SSH_AUTH_PASSWORD,
-            # 'private_key': self._conn.SSH_PRIVATE_KEYFILE
             # ref: https://curl.haxx.se/libcurl/c/CURLOPT_SSH_PRIVATE_KEYFILE.html
+            'keyfile': self._conn.SSH_AUTH_PUBLICKEY
         }
 
         try:
@@ -1039,6 +1049,10 @@ class SFTP(UploadService):
         if auth_type == 'password':
             self._conn.setopt(self._conn.USERNAME, self._username)
             self._conn.setopt(self._conn.PASSWORD, self._password)
+        elif auth_type == 'keyfile':
+            self._conn.setopt(self._conn.USERNAME, self._username)
+            self._conn.setopt(self._conn.SSH_PRIVATE_KEYFILE, self._keyfile)
+            self._conn.setopt(self._conn.SSH_PUBLIC_KEYFILE, (self._keyfile + ".pub"))
 
         self._conn.setopt(self._conn.UPLOAD, 1)
 
